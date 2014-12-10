@@ -1,0 +1,39 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+obj
+
+#alias.br branch
+#alias.st status
+#alias.co checkout
+#alias.ci commit
+#alias.graph log --graph --format="%C(auto)%h %<(65,trunc)%s %Cblue%>(28)%an %Cred%cr"
+#alias.di diff
+#alias.cl clone
