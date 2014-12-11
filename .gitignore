@@ -29,6 +29,8 @@
 *.hex
 
 obj
+.*
+!.git*
 
 #alias.br branch
 #alias.st status
