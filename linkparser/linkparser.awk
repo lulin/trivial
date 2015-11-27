@@ -1,10 +1,14 @@
 #!@include "functions.awk"
 
 BEGIN {
+	version = "0.1.2"
+	printf("link-parser, v%s\n", version)
+
 	true = 1
 	false = 0
 	g_pat_srccommon = "\\/sw\\/vobs.+"
 	g_sroot = ""
+	inst_root = ""
 	tar_root = ""
 
 	# Colors
@@ -19,7 +23,14 @@ BEGIN {
 		SKIP_END = true
 		exit 0
 	}
+
+	if (arg ~ /pretend/) {
+		pretend = true
+	}
 	count = 0
+
+	# Skip head lines
+	getline
 }
 
 /^[^-]/ {
@@ -28,43 +39,76 @@ BEGIN {
 	gsub(/[ \t]+\\$/, "", link)
 
 	if (g_sroot == "") {
+		printf("Grabbing sources and headers ...\n")
 		g_sroot = get_sroot(link)
-		system("mkdir ." g_sroot)
+		"date +%Y%m%d%H-%M%S" | getline date
+		inst_root = g_sroot"-"date
 	}
+
+	# ---------
+	# Sources
+	# ---------
 
 	cmd_file = link".cmd"
 	while ((getline line < cmd_file) > 0) {
 		# abosolute path
 		if (line ~ /[ \t]+-c[ \t]+\/.+$/)
 			source = gensub(/^.+[ \t]+-c[ \t]+(.+)$/, "\\1", "g", line)
-		# relative path
-		else
+		else # relative path
 			source = gensub(/^cd (.+);.+-c (.+)/, "\\1/\\2", "g", line)
 
-		print BLU source NC
-		if (source == "") {
-			print RED "+++++++"line NC
-		}
-
-		dir = dirname(source)
-		base = basename(source)
-		patt = "^.+\\/"g_sroot"\\/(sw.+)"
-		rel_path = gensub(patt, "\\1", "g", dir)
-
-		system("mkdir -p ." g_sroot "/" rel_path)
-		system("cp " source " ." g_sroot "/" rel_path)
-
-		count = count + 1
+		rel_install(source, g_sroot, inst_root)
 	}
+	close(cmd_file)
+
+	# ---------
+	# Headers
+	# ---------
+
+	gsub(/\.(obj|o|lib)$/, "", link)
+	dep_file = link ".D"
+
+	if ((getline < dep_file) < 0)
+		next
+
+	# Get path prefix
+	cur_path = $1
+	gsub(/^#/, "", cur_path)
+
+	while ((getline < dep_file) > 0) {
+		gsub(/:/, " ")
+		for (i = 1; i <= NF; i++) {
+			if ($i !~ /\.(h|hpp)$/)
+				continue
+			header = cur_path "/" $i
+			rel_install(header, g_sroot, inst_root)
+		}
+	}
+	close(dep_file)
 }
 
 END {
 	print "Total dumped files: " count
-	"date +%Y%m%d%H%M%S" | getline date
-	tarball = g_sroot "." date ".tar.gz"
+	if (pretend)
+		exit 0
+
+	tarball = inst_root ".tar.gz"
 	printf("Generating source tarball %s%s%s%s ...\n", RED, BOL, tarball, NC)
-	system("tar zcf " tarball " ." g_sroot)
-	system("rm -r ."g_sroot)
+	system("tar zcf " tarball " " inst_root)
+	system("rm -r "inst_root)
+}
+
+function rel_install(source, rel_root, new_root) {
+	count++
+	dir = dirname(source)
+	base = basename(source)
+	patt = "^.+\\/"rel_root"\\/(sw.+)"
+	rel_path = gensub(patt, "\\1", "g", dir)
+
+	if (pretend)
+		return 0
+	system("mkdir -p " new_root "/" rel_path)
+	system("cp -L " source " " new_root "/" rel_path)
 }
 
 function get_sroot(line) {
