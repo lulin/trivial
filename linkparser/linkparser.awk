@@ -1,7 +1,5 @@
-#!@include "functions.awk"
-
 BEGIN {
-	version = "0.1.2"
+	version = "0.1.3"
 	printf("link-parser, v%s\n", version)
 
 	true = 1
@@ -18,7 +16,9 @@ BEGIN {
 	NC="\033[0m"
 	BOL="\033[1m"
 
-	if (arg ~ /test/) {
+	count = 0
+
+	if (arg ~ /ut/) {
 		do_test();
 		SKIP_END = true
 		exit 0
@@ -27,7 +27,15 @@ BEGIN {
 	if (arg ~ /pretend/) {
 		pretend = true
 	}
-	count = 0
+
+	if (arg ~ /dest=/) {
+		destdir = gensub(/^.+dest=([^ \t;,]+)/, "\\1", "g", arg)
+		if (system("test -d " destdir) != 0) {
+			print "Directory [" destdir "] doesn't exist!"
+			SKIP_END = true
+			exit 0
+		}
+	}
 
 	# Skip head lines
 	getline
@@ -41,7 +49,7 @@ BEGIN {
 	if (g_sroot == "") {
 		printf("Grabbing sources and headers ...\n")
 		g_sroot = get_sroot(link)
-		"date +%Y%m%d%H-%M%S" | getline date
+		"date +%Y%m%d-%H%M%S" | getline date
 		inst_root = g_sroot"-"date
 	}
 
@@ -88,27 +96,47 @@ BEGIN {
 }
 
 END {
-	print "Total dumped files: " count
-	if (pretend)
+	if (SKIP_END)
 		exit 0
-
-	tarball = inst_root ".tar.gz"
-	printf("Generating source tarball %s%s%s%s ...\n", RED, BOL, tarball, NC)
-	system("tar zcf " tarball " " inst_root)
-	system("rm -r "inst_root)
+	print "Total dumped files: " count
+	if (arg ~ /tar/)
+		make_tarball(arg)
 }
 
 function rel_install(source, rel_root, new_root) {
 	count++
+	if (pretend)
+		return 0
+	
 	dir = dirname(source)
 	base = basename(source)
 	patt = "^.+\\/"rel_root"\\/(sw.+)"
 	rel_path = gensub(patt, "\\1", "g", dir)
 
-	if (pretend)
-		return 0
+	if (destdir)
+		new_root = destdir "/" new_root
+
 	system("mkdir -p " new_root "/" rel_path)
 	system("cp -L " source " " new_root "/" rel_path)
+}
+
+function make_tarball(flag) {
+	tarball = inst_root ".tar.gz"
+	printf("Generating source tarball %s%s%s%s ...\n", RED, BOL, tarball, NC)
+
+	if (pretend || SKIP_END)
+		exit 0
+
+	"pwd" |getline oldpwd
+	if (destdir)
+		system("cd " destdir)
+
+	system("tar zcf " tarball " " inst_root)
+	if (flag ~ /purge/)
+		system("rm -r "inst_root)
+
+	if (destdir)
+		system("cd " oldpwd)
 }
 
 function get_sroot(line) {
