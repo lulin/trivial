@@ -105,8 +105,6 @@ END {
 
 function rel_install(source, rel_root, new_root) {
 	count++
-	if (pretend)
-		return 0
 	
 	dir = dirname(source)
 	base = basename(source)
@@ -115,6 +113,12 @@ function rel_install(source, rel_root, new_root) {
 
 	if (destdir)
 		new_root = destdir "/" new_root
+
+	if (pretend) {
+		print source > rel_root".source.list"
+		print rel_path"/"base > rel_root".relative.list"
+		return 0
+	}
 
 	system("mkdir -p " new_root "/" rel_path)
 	system("cp -L " source " " new_root "/" rel_path)
