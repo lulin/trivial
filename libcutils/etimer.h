@@ -37,11 +37,18 @@ struct etimer {
 //	return val;
 //}
 
+static inline struct etimer *etimer_new()
+{
+	struct etimer *etimer;
+	etimer = (struct etimer*)malloc(sizeof(struct etimer));
+	etimer->state = ETIMER_INIT;
+	etimer->elapsed = 0;
+}
+
 static inline struct etimer *etimer_start(struct etimer *etimer)
 {
 	if (etimer == NULL) {
-		etimer = (struct etimer*)malloc(sizeof(struct etimer));
-		etimer->state = ETIMER_INIT;
+		etimer = etimer_new();
 	}
 
 	if (etimer == ETIMER_STOPPED)
