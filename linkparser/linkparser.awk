@@ -53,10 +53,6 @@ BEGIN {
 		inst_root = g_sroot"-"date
 	}
 
-	# ---------
-	# Sources
-	# ---------
-
 	cmd_file = link".cmd"
 	while ((getline line < cmd_file) > 0) {
 		# abosolute path
@@ -65,42 +61,71 @@ BEGIN {
 		else # relative path
 			source = gensub(/^cd (.+);.+-c (.+)/, "\\1/\\2", "g", line)
 
-		rel_install(source, g_sroot, inst_root)
+		gsub(/esam\/objects\/([^\/]+\/){2,}sources\/src/, "dsl/sw/flat", source)
+		sources[source]++
+		#rel_install(source, g_sroot, inst_root)
+
+		split(line, a, " ")
+		prefix = gensub(/^cd (.+);.+/, "\\1", "g", line)
+		for (i in a) {
+			if (a[i] ~ /^-I/) {
+				gsub(/^-I/, "", a[i])
+				gsub(/esam\/objects\/([^\/]+\/)\{2,}sources\/src/, "dsl/sw/flat", a[i])
+				if (a[i] ~ /^\//)
+					includes[a[i]]++
+				else
+					includes[prefix "/" a[i]]++
+			}
+		}
 	}
+
 	close(cmd_file)
 
 	# ---------
 	# Headers
 	# ---------
 
-	gsub(/\.(obj|o|lib)$/, "", link)
-	dep_file = link ".D"
-
-	if ((getline < dep_file) < 0)
-		next
-
-	# Get path prefix
-	cur_path = $1
-	gsub(/^#/, "", cur_path)
-
-	while ((getline < dep_file) > 0) {
-		gsub(/:/, " ")
-		for (i = 1; i <= NF; i++) {
-			if ($i !~ /\.(h|hpp)$/)
-				continue
-			header = cur_path "/" $i
-			rel_install(header, g_sroot, inst_root)
-		}
-	}
-	close(dep_file)
+#	gsub(/\.(obj|o|lib)$/, "", link)
+#	dep_file = link ".D"
+#
+#	if ((getline < dep_file) < 0)
+#		next
+#
+#	# Get path prefix
+#	cur_path = $1
+#	gsub(/^#/, "", cur_path)
+#
+#	while ((getline < dep_file) > 0) {
+#		gsub(/:/, " ")
+#		for (i = 1; i <= NF; i++) {
+#			if ($i !~ /\.(h|hpp)$/)
+#				continue
+#			header = cur_path "/" $i
+#			rel_install(header, g_sroot, inst_root)
+#		}
+#	}
+#	close(dep_file)
 }
 
 END {
 	if (SKIP_END)
 		exit 0
 	print "Total dumped files: " count
+	
+	for (i in sources)
+		rel_install(i, g_sroot, inst_root)
+
+	for (i in includes) {
+
+		#rel_install(i, g_sroot, inst_root)
+	}
+
 	if (arg ~ /tar/)
 		make_tarball(arg)
+}
+
+function get_include(line) {
+	inc = gensub(/^(-[^I]+|[^-]+) -I(.+)/, "\\2", "g")
 }
 
 function rel_install(source, rel_root, new_root) {
@@ -121,7 +146,7 @@ function rel_install(source, rel_root, new_root) {
 	}
 
 	system("mkdir -p " new_root "/" rel_path)
-	system("cp -L " source " " new_root "/" rel_path)
+	system("cp -Lr " source " " new_root "/" rel_path)
 }
 
 function make_tarball(flag) {
