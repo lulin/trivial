@@ -1,5 +1,5 @@
 BEGIN {
-	version = "0.1.3"
+	version = "0.2.0"
 	printf("link-parser, v%s\n", version)
 
 	true = 1
@@ -53,6 +53,10 @@ BEGIN {
 		inst_root = g_sroot"-"date
 	}
 
+	# ---------
+	# Sources
+	# ---------
+
 	cmd_file = link".cmd"
 	while ((getline line < cmd_file) > 0) {
 		# abosolute path
@@ -61,71 +65,70 @@ BEGIN {
 		else # relative path
 			source = gensub(/^cd (.+);.+-c (.+)/, "\\1/\\2", "g", line)
 
-		gsub(/esam\/objects\/([^\/]+\/){2,}sources\/src/, "dsl/sw/flat", source)
-		sources[source]++
-		#rel_install(source, g_sroot, inst_root)
+		# path transform
+		#patt = "vobs\\/esam\\/objects\\/([^\\/]+\\/){2,2}sources\\/"
+		patt = "vobs\\/esam\\/objects\\/.+\\/sources\\/(flat|src)"
+		gsub(patt, "vobs/dsl/sw/flat", source)
 
-		split(line, a, " ")
-		prefix = gensub(/^cd (.+);.+/, "\\1", "g", line)
-		for (i in a) {
-			if (a[i] ~ /^-I/) {
-				gsub(/^-I/, "", a[i])
-				gsub(/esam\/objects\/([^\/]+\/)\{2,}sources\/src/, "dsl/sw/flat", a[i])
-				if (a[i] ~ /^\//)
-					includes[a[i]]++
-				else
-					includes[prefix "/" a[i]]++
-			}
-		}
+		patt = "vobs\\/esam\\/objects\\/.+\\/sources\\/itf"
+		gsub(patt, "vobs/dsl/sw/itf", source)
+
+		patt = "\\/esam\\/.+\\/dummy\\.c"
+		if (source ~ patt)
+			continue;
+
+		rel_install(source, g_sroot, inst_root)
 	}
-
 	close(cmd_file)
 
 	# ---------
 	# Headers
 	# ---------
 
-#	gsub(/\.(obj|o|lib)$/, "", link)
-#	dep_file = link ".D"
-#
-#	if ((getline < dep_file) < 0)
-#		next
-#
-#	# Get path prefix
-#	cur_path = $1
-#	gsub(/^#/, "", cur_path)
-#
-#	while ((getline < dep_file) > 0) {
-#		gsub(/:/, " ")
-#		for (i = 1; i <= NF; i++) {
-#			if ($i !~ /\.(h|hpp)$/)
-#				continue
-#			header = cur_path "/" $i
-#			rel_install(header, g_sroot, inst_root)
-#		}
-#	}
-#	close(dep_file)
+	gsub(/\.(obj|o|lib)$/, "", link)
+	dep_file = link ".D"
+
+	if ((getline < dep_file) < 0)
+		next
+
+	# Get path prefix
+	cur_path = $1
+	gsub(/^#/, "", cur_path)
+
+	while ((getline < dep_file) > 0) {
+		gsub(/.+:/, " ")
+		for (i = 1; i <= NF; i++) {
+			#if ($i !~ /\.(h|hpp)$/)
+			#	continue
+			if ($i == "\\") continue
+
+			header = cur_path "/" $i
+			if (!buildroot_host_path) {
+				patt = "(.+\\/esam\\/.+\\/output\\/host)\\/.+$"
+				if (header ~ patt) {
+					buildroot_host_path = gensub(patt, "\\1", "g", header)
+
+					patt = ".+\\/"g_sroot"\\/sw\\/vobs"
+					gsub(patt, inst_root"/sw/vobs", buildroot_host_path)
+				}
+			}
+
+			rel_install(header, g_sroot, inst_root)
+		}
+	}
+	close(dep_file)
 }
 
 END {
 	if (SKIP_END)
 		exit 0
 	print "Total dumped files: " count
-	
-	for (i in sources)
-		rel_install(i, g_sroot, inst_root)
 
-	for (i in includes) {
-
-		#rel_install(i, g_sroot, inst_root)
-	}
+	if (buildroot_host_path && arg !~ /pretend/)
+		system("mv " buildroot_host_path " " inst_root)
 
 	if (arg ~ /tar/)
 		make_tarball(arg)
-}
-
-function get_include(line) {
-	inc = gensub(/^(-[^I]+|[^-]+) -I(.+)/, "\\2", "g")
 }
 
 function rel_install(source, rel_root, new_root) {
@@ -146,7 +149,7 @@ function rel_install(source, rel_root, new_root) {
 	}
 
 	system("mkdir -p " new_root "/" rel_path)
-	system("cp -Lr " source " " new_root "/" rel_path)
+	system("cp -fL " source " " new_root "/" rel_path)
 }
 
 function make_tarball(flag) {
