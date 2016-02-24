@@ -65,6 +65,18 @@ BEGIN {
 		else # relative path
 			source = gensub(/^cd (.+);.+-c (.+)/, "\\1/\\2", "g", line)
 
+		# path transform
+		#patt = "vobs\\/esam\\/objects\\/([^\\/]+\\/){2,2}sources\\/"
+		patt = "vobs\\/esam\\/objects\\/.+\\/sources\\/(flat|src)"
+		gsub(patt, "vobs/dsl/sw/flat", source)
+
+		patt = "vobs\\/esam\\/objects\\/.+\\/sources\\/itf"
+		gsub(patt, "vobs/dsl/sw/itf", source)
+
+		patt = "\\/esam\\/.+\\/dummy\\.c"
+		if (source ~ patt)
+			continue;
+
 		rel_install(source, g_sroot, inst_root)
 	}
 	close(cmd_file)
@@ -73,32 +85,34 @@ BEGIN {
 	# Headers
 	# ---------
 
-	gsub(/\.(obj|o|lib)$/, "", link)
-	dep_file = link ".D"
-
-	if ((getline < dep_file) < 0)
-		next
-
-	# Get path prefix
-	cur_path = $1
-	gsub(/^#/, "", cur_path)
-
-	while ((getline < dep_file) > 0) {
-		gsub(/:/, " ")
-		for (i = 1; i <= NF; i++) {
-			if ($i !~ /\.(h|hpp)$/)
-				continue
-			header = cur_path "/" $i
-			rel_install(header, g_sroot, inst_root)
-		}
-	}
-	close(dep_file)
+#	gsub(/\.(obj|o|lib)$/, "", link)
+#	dep_file = link ".D"
+#
+#	if ((getline < dep_file) < 0)
+#		next
+#
+#	# Get path prefix
+#	cur_path = $1
+#	gsub(/^#/, "", cur_path)
+#
+#	while ((getline < dep_file) > 0) {
+#		gsub(/:/, " ")
+#		for (i = 1; i <= NF; i++) {
+#			if ($i !~ /\.(h|hpp)$/)
+#				continue
+#			header = cur_path "/" $i
+#
+#			rel_install(header, g_sroot, inst_root)
+#		}
+#	}
+#	close(dep_file)
 }
 
 END {
 	if (SKIP_END)
 		exit 0
 	print "Total dumped files: " count
+
 	if (arg ~ /tar/)
 		make_tarball(arg)
 }
