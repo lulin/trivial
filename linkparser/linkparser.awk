@@ -1,12 +1,11 @@
 BEGIN {
-	version = "0.2.0"
+	version = "0.3.1"
 	printf("link-parser, v%s\n", version)
 
 	true = 1
 	false = 0
-	g_pat_srccommon = "\\/sw\\/vobs.+"
-	g_sroot = ""
-	inst_root = ""
+	g_srcroot = ""
+	g_instroot = ""
 	tar_root = ""
 
 	# Colors
@@ -37,28 +36,57 @@ BEGIN {
 		}
 	}
 
-	# Skip head lines
-	getline
+	# Get g_srcroot
+	getline line
+	get_g_srcroot(line)
+	printf("Parsing and dumping, this may take for a while...\n")
 }
 
 /^[^-]/ {
+	# A link is a file name suffixed with '.o', '.lib' or '.obj' in a line.
 	link = $0
 	# Remove the ending ' \'
 	gsub(/[ \t]+\\$/, "", link)
 
-	if (g_sroot == "") {
-		printf("Grabbing sources and headers ...\n")
-		g_sroot = get_sroot(link)
-		"date +%Y%m%d-%H%M%S" | getline date
-		inst_root = g_sroot"-"date
-	}
-
-	# ---------
-	# Sources
-	# ---------
-
+	# Parse .cmd files
 	cmd_file = link".cmd"
-	while ((getline line < cmd_file) > 0) {
+	parse_cmd(cmd_file)
+}
+
+function get_g_srcroot(line) {
+	if (g_srcroot)
+		return
+
+	patt = "\\/sw\\/vobs.+"
+	if (line !~ patt)
+		return
+
+	gsub(patt, "", line)
+	patt = ".+\\/"
+	gsub(patt, "", line)
+	g_srcroot = line
+	"date +%Y%m%d-%H%M%S" | getline date
+	g_instroot = g_srcroot"-"date
+
+	if (destdir)
+		g_instroot = destdir"/"g_instroot
+}
+
+function parse_cmd(cmd) {
+	while ((getline line < cmd) > 0) {
+		# Get dependence file, in the argument of option '-Wp,-MD'
+		patt = "cd (.+);.+-MD,([^ \t]+)\\.d.+"
+		if (line ~ patt) {
+			dep = gensub(patt, "\\1/\\2.D", "g", line)
+			# Parsing dependence file
+			parse_dep(dep)
+		} else if (pretend) {
+			print RED line NC
+		}
+
+		# Get source file, suffixed with '.c', '.cpp', or '.cc'
+		# ...
+
 		# abosolute path
 		if (line ~ /[ \t]+-c[ \t]+\/.+$/)
 			source = gensub(/^.+[ \t]+-c[ \t]+(.+)$/, "\\1", "g", line)
@@ -77,25 +105,19 @@ BEGIN {
 		if (source ~ patt)
 			continue;
 
-		rel_install(source, g_sroot, inst_root)
+		rel_install(source, g_srcroot, g_instroot)
 	}
-	close(cmd_file)
+	close(cmd)
+}
 
-	# ---------
-	# Headers
-	# ---------
-
-	gsub(/\.(obj|o|lib)$/, "", link)
-	dep_file = link ".D"
-
-	if ((getline < dep_file) < 0)
-		next
-
+function parse_dep(dep) {
 	# Get path prefix
+	if ((getline < dep) < 0)
+		return
 	cur_path = $1
 	gsub(/^#/, "", cur_path)
 
-	while ((getline < dep_file) > 0) {
+	while ((getline < dep) > 0) {
 		gsub(/.+:/, " ")
 		for (i = 1; i <= NF; i++) {
 			#if ($i !~ /\.(h|hpp)$/)
@@ -108,15 +130,15 @@ BEGIN {
 				if (header ~ patt) {
 					buildroot_host_path = gensub(patt, "\\1", "g", header)
 
-					patt = ".+\\/"g_sroot"\\/sw\\/vobs"
-					gsub(patt, inst_root"/sw/vobs", buildroot_host_path)
+					patt = ".+\\/"g_srcroot"\\/sw\\/vobs"
+					gsub(patt, g_instroot"/sw/vobs", buildroot_host_path)
 				}
 			}
 
-			rel_install(header, g_sroot, inst_root)
+			rel_install(header, g_srcroot, g_instroot)
 		}
 	}
-	close(dep_file)
+	close(dep)
 }
 
 END {
@@ -125,7 +147,7 @@ END {
 	print "Total dumped files: " count
 
 	if (buildroot_host_path && arg !~ /pretend/)
-		system("mv " buildroot_host_path " " inst_root)
+		system("mv " buildroot_host_path " " g_instroot"/sw/")
 
 	if (arg ~ /tar/)
 		make_tarball(arg)
@@ -139,9 +161,6 @@ function rel_install(source, rel_root, new_root) {
 	patt = "^.+\\/"rel_root"\\/(sw.+)"
 	rel_path = gensub(patt, "\\1", "g", dir)
 
-	if (destdir)
-		new_root = destdir "/" new_root
-
 	if (pretend) {
 		print source > rel_root".source.list"
 		print rel_path"/"base > rel_root".relative.list"
@@ -149,35 +168,29 @@ function rel_install(source, rel_root, new_root) {
 	}
 
 	system("mkdir -p " new_root "/" rel_path)
+
+	cmdline = "if test -e " new_root "/" rel_path "/" base \
+		";then echo yes;else echo no;fi"
+	cmdline |getline ret
+	close(cmdline)
+	if (ret == "yes") {
+		count--
+		return 0
+	}
+
 	system("cp -fL " source " " new_root "/" rel_path)
 }
 
 function make_tarball(flag) {
-	tarball = inst_root ".tar.gz"
+	tarball = g_instroot ".tar.gz"
 	printf("Generating source tarball %s%s%s%s ...\n", RED, BOL, tarball, NC)
 
 	if (pretend || SKIP_END)
 		exit 0
 
-	"pwd" |getline oldpwd
-	if (destdir)
-		system("cd " destdir)
-
-	system("tar zcf " tarball " " inst_root)
+	system("tar zcf " tarball " " g_instroot)
 	if (flag ~ /purge/)
-		system("rm -r "inst_root)
-
-	if (destdir)
-		system("cd " oldpwd)
-}
-
-function get_sroot(line) {
-	if (line !~ g_pat_srccommon)
-		return ""
-
-	gsub(g_pat_srccommon, "", line);
-	gsub(/.+\//, "", line);
-	return line;
+		system("rm -r "g_instroot)
 }
 
 # dirname
@@ -217,10 +230,6 @@ function basename(path) {
 
 ###### Test #########
 function do_test() {
-	printf("%s%s%s%s\n", BLU, BOL, "---- Test get_sroot ----", NC)
-	test_get_sroot("/repo/lulinw/isam/sw/vobs/esam/build");
-	test_get_sroot("/repo/lulinw/isam/sw/esam/build");
-
 	printf("%s%s%s%s\n", BLU, BOL, "---- Test dirname ----", NC)
 	test_dirname("/home/abc");
 	test_dirname("home///abc//");
@@ -238,14 +247,6 @@ function do_test() {
 	test_basename("../abc//")
 	test_basename("/../abc//")
 	test_basename("/../abc/efg/")
-}
-
-function test_get_sroot(line) {
-	if ((ret = get_sroot(line)) == "") {
-		printf("Unexpected line [PAT=%s]:\n  %s%s%s\n",
-				g_pat_srccommon, RED, line, NC)
-	} else
-		printf("Root of %s is\n  %s%s%s\n", line, GRN, get_sroot(line), NC)
 }
 
 function test_dirname(path) {
