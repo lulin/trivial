@@ -31,6 +31,7 @@
 obj
 .*
 !.git*
+*.rkt~
 
 #alias.br branch
 #alias.st status
