@@ -2,7 +2,7 @@ EXEC = a.out
 SRCS = $(wildcard *.cpp)
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
-CXXFLAGS = -Wall -g
+CXXFLAGS = -Wall -g# -std=c++11
 LDFLAGS =
 
 LD = g++
