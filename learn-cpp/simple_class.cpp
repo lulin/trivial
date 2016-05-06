@@ -17,4 +17,7 @@ namespace Sample {
   SimpleCl::~SimpleCl(){}
 
   int SimpleCl::getCount() {return count;}
+  void SimpleCl::pretty_print() {
+    return;
+  }
 }
