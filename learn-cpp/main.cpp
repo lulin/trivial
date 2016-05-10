@@ -20,10 +20,41 @@ int main(int argc, char *argv[])
   g_smap.insert(pair<string, Sample::SimpleCl *>(string("first"), sa));
 
   cout << "g_smap[\"first\"].count = " << sa->getCount() << endl;
-  //delete sa;
-  g_smap.erase("first");
   delete sa;
   cout << "g_smap[\"first\"].count = " << Sample::SimpleCl::getCount() << endl;
+  cout << "segment fault? " << g_smap["first"]->getCount() << endl;
+  g_smap.erase("first");
+  //delete sa;
+  cout << "g_smap[\"first\"].count = " << Sample::SimpleCl::getCount() << endl;
+
+  cout << "Test `delete' keyword ..." << endl;
+  Sample::SimpleCl *sb = new Sample::SimpleCl(99);
+  cout << "Printing instance count after creating an object by new keyword: "
+       << Sample::SimpleCl::getCount() << endl;
+
+  Sample::SimpleCl *sc = sb;
+  sc->setNumber(88);
+  cout << "Printing instance count after referring by a new pointer: "
+       << Sample::SimpleCl::getCount() << endl;
+
+  delete sb;
+  cout << "Printing instance count after deletting a pointer: "
+       << Sample::SimpleCl::getCount() << endl;
+
+  // Will calling delete on a pointer affect the equal reference which is an
+  // element of a map?
+  cout << "Test map element referring." << endl;
+  Sample::SimpleCl *sd = new Sample::SimpleCl("sd", 7);
+  g_smap.insert(pair<string, Sample::SimpleCl *>(sd->Name(), sd));
+  cout << "New instance: " << sd->Name() << "," << sd->Number() << endl;
+  cout << "Count: " << sd->getCount() << endl;
+
+  cout << "Erase (" << sd->Name() << "," << sd->Number() << ") from map" << endl;
+  g_smap.erase(sd->Name());
+  cout << "Count: " << sd->getCount() << endl;
+  cout << "map(" << sd->Name() << ") ?= nil : "
+       << (g_smap[sd->Name()] == NULL? "yes": "no")
+       << endl;
 
 	return 0;
 }
