@@ -33,6 +33,13 @@ obj
 !.git*
 *.rkt~
 
+GTAGS
+GSYMS
+GRTAGS
+GPATH
+
+.*.swp
+
 #alias.br branch
 #alias.st status
 #alias.co checkout
