@@ -5,6 +5,7 @@
 using namespace std;
 
 extern map<string, Sample::SimpleCl *> g_smap;
+Sample::SimpleCl *g_simple = new Sample::SimpleCl();
 
 int main(int argc, char *argv[])
 {
@@ -56,5 +57,13 @@ int main(int argc, char *argv[])
        << (g_smap[sd->Name()] == NULL? "yes": "no")
        << endl;
 
+  // Test operator overload
+  Sample::SimpleCl se(10);
+  // se = se + 1;
+  cout << "Number of SimpleCl(10) + 1 = " << (se + 1).Number() << endl;
+
+  Sample::Assist as;
+  se.setHook(&as.hook, &as);
+  se.callHook();
 	return 0;
 }

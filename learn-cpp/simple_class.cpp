@@ -28,4 +28,33 @@ namespace Sample {
   }
 
   string SimpleCl::Name() {return string(this->name);}
+
+  void SimpleCl::setHook(hook_t *h, Assist *a) {
+    if (h && a) {
+      hk = h;
+      this->a = a;
+    }
+  }
+
+  void SimpleCl::callHook() {
+    if (hk && a)
+      hk(a, this);
+  }
+
+  // Operators:
+  SimpleCl& operator+(SimpleCl& s, int n) {
+    s.setNumber(s.Number() + n);
+    return s;
+  }
+
+  Assist::Assist(string m): msg(m) {};
+  void Assist::hook(Assist *a, SimpleCl *s) {
+    cout << "Call hook : " << s->Number() << endl;
+    cout << "Assist says \"" << a->getMsg() << "\"" << endl;
+  }
+
+  string& Assist::getMsg() {return msg;}
+
+  SpecConstr::SpecConstr(int n): number(n) {};
+  int SpecConstr::getNumber() {return number;}
 }

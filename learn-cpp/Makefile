@@ -6,7 +6,11 @@ CXXFLAGS = -Wall -g# -std=c++11
 LDFLAGS =
 
 LD = g++
+ifeq ($(shell which clang),)
 CXX = g++
+else
+CXX = $(shell which clang)
+endif
 
 .PHONY: all clean rebuild
 
