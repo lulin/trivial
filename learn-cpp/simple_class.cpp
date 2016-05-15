@@ -47,6 +47,15 @@ namespace Sample {
     return s;
   }
 
+  int& SimpleCl::operator[](int i) {
+    if (i < 0 || i >= SimpleCl::array_size) {
+      // throw an overflow exception
+      return array[array_size - 1];
+    }
+
+    return array[i];
+  }
+
   Assist::Assist(string m): msg(m) {};
   void Assist::hook(Assist *a, SimpleCl *s) {
     cout << "Call hook : " << s->Number() << endl;

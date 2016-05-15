@@ -22,11 +22,15 @@ namespace Sample {
     void callHook();
 
     const static size_t name_size = 256;
+    const static size_t array_size = 20;
+
+    int& operator[](int index);
 
   private:
     static int count;
     int number;
     char name[name_size];
+    int array[array_size];
 
     hook_t *hk;
     Assist *a;

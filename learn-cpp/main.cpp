@@ -65,5 +65,8 @@ int main(int argc, char *argv[])
   Sample::Assist as;
   se.setHook(&as.hook, &as);
   se.callHook();
+
+  se[0] = 65;
+  cout << "Se[0] = " << se[0] << endl;
 	return 0;
 }
