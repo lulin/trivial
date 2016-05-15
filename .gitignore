@@ -33,12 +33,18 @@ obj
 !.git*
 *.rkt~
 
+# gtags
 GTAGS
 GSYMS
 GRTAGS
 GPATH
 
 .*.swp
+
+# cmake
+CMakeCache*
+cmake_install*
+CMakeFiles
 
 #alias.br branch
 #alias.st status
@@ -47,3 +53,6 @@ GPATH
 #alias.graph log --graph --format="%C(auto)%h %<(65,trunc)%s %Cblue%>(28)%an %Cred%cr"
 #alias.di diff
 #alias.cl clone
+
+# Project sepcific
+learn-cpp/Makefile
