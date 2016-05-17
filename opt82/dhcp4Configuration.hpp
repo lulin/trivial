@@ -1,46 +1,84 @@
-#ifndef DHCP4CONFIGURATION_HPP_
-#define DHCP4CONFIGURATION_HPP_
+#ifndef DHCP4_CONFIGURATION_HPP_
+#define DHCP4_CONFIGURATION_HPP_
+
+#include "../../yangobj/ietf_interfaces.hpp"
 
 namespace ns_opt82 {
-  class Opt82Profile {
+  class DHCP4Profile {
     //
   };
 
-  typedef map<std::string, Opt82Profile *> Opt82Profs_T;
+  class Dhcp4Configuration {
+    bool enabled;
+    bool portTrusted;
+    // Profile reference name
+    std::string profileName;
+    // The opt82 profile cache
+    DHCP4Profile *dhcp4Prof;
+  };
 
-  class I_Opt82Profiles {
+  class SubscriberProfile {
   public:
   private:
-    // The container
-    Opt82Profs_T *profs;
+  };
+
+  class SubscriberConfiguration {
+  public:
+    SubscriberConfiguration(SubscriberProfile *s = NULL): subsProf(s) {}
+
+  private:
+    // Subscriber profile name
+    std::string subsProfName;
+    // Subscriber profile
+    SubscriberProfile *subsProf;
   };
 
   class SubInterface {
   public:
+    explicit SubInterface(int objIndex);
+    ~SubInterface();
+
+    int& getObjIndex() {return objIndex;}
+
+    bool& isEnabled() {return enabled;}
+    // The accesser to @enabled@
+    bool& Enable() {return enabled;}
+
+    // The accesser to @dhcp4@
+    Dhcp4Configuration& DHCP4() {return dhcp4;}
+    Dhcp4Configuration& getDHCP4() {return dhcp4;}
+    void setDHCP4(dhcp4Configuration& d) {dhcp4 = d;}
+
+    // The accesser to @subsConf@
+    SubscriberConfiguration& SubsConf() {return subsConf;}
+    SubscriberConfiguration& getSubsConf() {return subsConf;}
+    void setSubsConfig(SubscriberProfile& s) {subsConf = s;}
+
   private:
-    // Profile reference name
-    std::string profileRef;
-    // The opt82 profile cache
-    Opt82Profile *opt82Prof;
+    int objIndex;
+    bool enabled;
+
+    // The bbf-dhcpv4 augment
+    dhcp4Configuration dhcp4;
+    // The bbf-subscriber-configuration augment
+    SubscriberConfiguration subsConf;
   };
 
   typedef map<int, SubInterface *> SubIfs_T;
 
-  enum E_ISubIfRet {
-    E_ISubIfRet_OK,
-  };
-
   class I_SubInterfaces {
   public:
-    I_SubInterfaces(SubIfs_T *s = NULL);
-    ~I_SubInterfaces() {}
+    I_SubInterfaces();
+    ~I_SubInterfaces();
 
     SubInterface *getSubIf(int objIndex);
-    E_ISubIfRet insertSubIf(SubInterface *subIf);
-    E_ISubIfRet removeSubIf(int objIndex, SubInterface *out);
+    int insertSubIf(SubInterface *subIf);
+    int removeSubIf(int objIndex, SubInterface *out);
+
   private:
-    // The subInterfaces container
+    // The SubInterfaces container
     SubIfs_T *subIfs;
   }
+
 }
 #endif

@@ -109,8 +109,8 @@ values."
                          ;;leuven
                          ;;monokai
                          ;;zenburn)
-   dotspacemacs-themes '(leuven
-                         monokai
+   dotspacemacs-themes '(monokai
+                         leuven
                          solarized-light
                          spacemacs-dark
                          zenburn)

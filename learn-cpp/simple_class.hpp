@@ -10,7 +10,7 @@ namespace Sample {
     SimpleCl(int n = 0);
     SimpleCl(const char *name, int n = 0);
     ~SimpleCl();
-    int Number();
+    int& Number();
     void setNumber(int n);
     void pretty_print();
     static int getCount();

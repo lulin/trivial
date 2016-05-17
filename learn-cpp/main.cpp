@@ -35,8 +35,10 @@ int main(int argc, char *argv[])
 
   Sample::SimpleCl *sc = sb;
   sc->setNumber(88);
+  sc->Number() = 79;
   cout << "Printing instance count after referring by a new pointer: "
        << Sample::SimpleCl::getCount() << endl;
+  cout << "sc->Number is " << sc->Number() << endl;
 
   delete sb;
   cout << "Printing instance count after deletting a pointer: "

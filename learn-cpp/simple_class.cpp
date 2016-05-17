@@ -20,7 +20,7 @@ namespace Sample {
     count--;
   }
 
-  int SimpleCl::Number() {return number;}
+  int& SimpleCl::Number() {return number;}
   void SimpleCl::setNumber(int n) {number = n;}
   int SimpleCl::getCount() {return count;}
   void SimpleCl::pretty_print() {
@@ -64,6 +64,6 @@ namespace Sample {
 
   string& Assist::getMsg() {return msg;}
 
-  SpecConstr::SpecConstr(int n): number(n) {};
+  SpecConstr::SpecConstr(int n = 0): number(n) {};
   int SpecConstr::getNumber() {return number;}
 }
