@@ -64,6 +64,6 @@ namespace Sample {
 
   string& Assist::getMsg() {return msg;}
 
-  SpecConstr::SpecConstr(int n = 0): number(n) {};
+  SpecConstr::SpecConstr(int n): number(n) {};
   int SpecConstr::getNumber() {return number;}
 }

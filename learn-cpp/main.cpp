@@ -77,17 +77,12 @@ int main(int argc, char *argv[])
 
   // Test copy initialization
   Sample::TestCopyInit t1(10);
-  Sample::TestCopyInit t2(&t1);
+  Sample::TestCopyInit t2(t1);
   cout << "t1.N = " << t1.N << ";    t2.N = " << t2.N << endl;
-
-  // Initialize with NULL
-  // Sample::TestCopyInit *nullptr = NULL;
-  Sample::TestCopyInit t3(reinterpret_cast<Sample::TestCopyInit *>(NULL));
-  cout << "t3.N = " << t3.N << endl;
-	return 0;
 
   // Test reference returning
   Sample::TestRef tr1;
-  tr1.O() = t1;
-  cout << "tr1.O() = " << tr1.O() << endl;
+  tr1.O() = t2;
+  cout << "tr1.O().N = " << tr1.O().N << endl;
+	return 0;
 }

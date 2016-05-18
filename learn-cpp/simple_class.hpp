@@ -63,18 +63,15 @@ namespace Sample {
 
   class TestCopyInit {
   public:
-    TestCopyInit(int n): N(n) {}
-    TestCopyInit(TestCopyInit *t) {
-      if (t == NULL)
-        return;
-      *this = *t;
-    }
+    TestCopyInit(int n = 0): N(n) {}
+    TestCopyInit(TestCopyInit &t) {*this = t;}
     int N;
   private:
   };
 
   class TestRef {
   public:
+    // TestRef();
     TestCopyInit & O() {return o;}
   private:
     TestCopyInit o;
