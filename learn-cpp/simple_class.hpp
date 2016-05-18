@@ -52,8 +52,32 @@ namespace Sample {
   public:
     SpecConstr(int n);
     int getNumber();
+    int getAnonymN() {return anonymN;}
   private:
     int number;
+    // Anonymous struct
+    struct {
+      int anonymN;
+    };
+  };
+
+  class TestCopyInit {
+  public:
+    TestCopyInit(int n): N(n) {}
+    TestCopyInit(TestCopyInit *t) {
+      if (t == NULL)
+        return;
+      *this = *t;
+    }
+    int N;
+  private:
+  };
+
+  class TestRef {
+  public:
+    TestCopyInit & O() {return o;}
+  private:
+    TestCopyInit o;
   };
 }
 
