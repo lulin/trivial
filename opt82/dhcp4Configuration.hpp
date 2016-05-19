@@ -2,7 +2,7 @@
 #define DHCP4_CONFIGURATION_HPP_
 
 #include <stdint.h>
-#include "../../yangobj/ietf_interfaces.hpp"
+//#include "../../yangobj/ietf_interfaces.hpp"
 
 namespace ns_opt82 {
   // DHCP4Profile & DHCP4Configuration
@@ -139,12 +139,8 @@ namespace ns_opt82 {
     int storeSubIf(SubInterface & subIf);
     // Erase a subInterface by @objIndex@.
     int eraseSubIf(int objIndex);
-    // Erase a subInterface object, and retrieve it in @out@, the element will
-    // be freed.
-    int eraseSubIf(int objIndex, SubInterface & out);
-    // Erase a subInterface, and retrieve the pointer in @out_Ptr@. Use 'delete'
-    // keyword to free the pointer.
-    int eraseSubIf(int objIndex, SubInterface *& out_Ptr);
+    // Erase a subInterface object, and retrieve it in @out@.
+    int eraseSubIf(int objIndex, SubInterface *& out);
 
     SubInterface * operator[](int objIndex);
 
