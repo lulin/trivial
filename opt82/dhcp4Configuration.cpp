@@ -1,11 +1,27 @@
 #include "../../include/dhcp4Configuration.hpp"
 
 namespace ns_opt82 {
+  // BaseInterface
   //-----------------------------------------------
+  BaseInterface::BaseInterface(std::string &nam): name(nam) {
+    // TODO: compute the network side.
+  }
+
+  E_BaseIfNetworkSide BaseInterface::getNetworkSide()
+
   // SubInterface
   //-----------------------------------------------
   SubInterface::SubInterface(int key): objIndex(key) {}
-  SubInterface::~SubInterface() {}
+  SubInterface::SubInterface(int key, std::string &ifName)
+    : bIf(BaseInterface(ifName)),
+      objIndex(key) {}
+  SubInterface::~SubInterface(int key, BaseInterface &base)
+    : bIf(base),
+      objIndex(key) {}
+
+  E_BaseIfNetworkSide SubInterface::getNetworkSide() {
+    return bIf.getNetworkSide();
+  }
 
   //-----------------------------------------------
   // I_SubInterfaces

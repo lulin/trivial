@@ -19,13 +19,26 @@ int main(int argc, char *argv[])
 
   cout << "g_smap[\"first\"].count = " << sa->getCount() << endl;
   g_smap.insert(pair<string, Sample::SimpleCl *>(string("first"), sa));
+  cout << "map[first].Number() = " << g_smap["first"]->Number() << endl;
 
-  cout << "g_smap[\"first\"].count = " << sa->getCount() << endl;
-  delete sa;
-  cout << "g_smap[\"first\"].count = " << Sample::SimpleCl::getCount() << endl;
-  cout << "segment fault? " << g_smap["first"]->getCount() << endl;
-  g_smap.erase("first");
+  sa->Number() = 7;
+  cout << "map[first].Number() = " << g_smap["first"]->Number() << endl;
+  g_smap["first"]->Number() = 8;
+  cout << "sa->Number() = " << sa->Number() << endl;
+
+  cout << "+++++++++++++++g_smap[\"first\"].count = " << sa->getCount() << endl;
+
+  cout << "addr sa = " << sa << " addr member = " << g_smap["first"] << endl;
   //delete sa;
+  cout << "addr sa = " << sa << " addr member = " << g_smap["first"] << endl;
+  g_smap["first"]->Number() = 9;
+  cout << "map[first].Number() = " << g_smap["first"]->Number() << endl;
+  cout << "-------------------g_smap[\"first\"].count = " << Sample::SimpleCl::getCount() << endl;
+  Sample::SimpleCl *ppppp =  g_smap["first"];
+  //delete ppppp;
+  g_smap.erase("first");
+  delete ppppp;
+  cout << "-------------------g_smap[\"first\"].count = " << Sample::SimpleCl::getCount() << endl;
   cout << "g_smap[\"first\"].count = " << Sample::SimpleCl::getCount() << endl;
 
   cout << "Test `delete' keyword ..." << endl;
@@ -84,5 +97,28 @@ int main(int argc, char *argv[])
   Sample::TestRef tr1;
   tr1.O() = t2;
   cout << "tr1.O().N = " << tr1.O().N << endl;
+
+  int ttrm1 = 9;
+  Sample::TestRefMemb trm1(ttrm1);
+  cout << "trm1.Ref() = " << trm1.Ref() << endl;
+
+  cout << " SimpleCl.getCount = " << Sample::SimpleCl::getCount() << endl;
+  Sample::SimpleCl *sp1 = new Sample::SimpleCl(99);
+  Sample::SimpleCl *sp2 = sp1;
+  cout << " SimpleCl.getCount = " << sp2->getCount() << endl;
+  delete sp1;
+  cout << "sp2.Number() = " << sp2->Number()
+       << " SimpleCl.getCount = " << sp2->getCount() << endl;
+  sp2->Number() = 11;
+  // delete sp2;
+  cout << " SimpleCl.getCount = " << Sample::SimpleCl::getCount() << endl;
+
+  std::string str1;
+  cout << "str1(uninitialized) content = " << str1 << endl;
+
+
+  Sample::TestMembInit tm("hehe");
+  cout << "tm.Sstr() = " << tm.Sstr() << endl;
+  // Return ------------------------------------------
 	return 0;
 }

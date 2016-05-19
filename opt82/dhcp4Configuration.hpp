@@ -28,18 +28,18 @@ namespace ns_opt82 {
 
   class DHCP4Configuration {
   public:
-    DHCP4Configuration(): dhcp4Prof(0) {}
+    DHCP4Configuration(DHCP4Profile *d = NULL): dhcp4Prof(d) {}
     bool isEnabled() {return enabled;}
     bool isPortTrusted() {return portTrusted;}
 
+    // Accessers
     bool & Enable() {return enabled;}
     bool & PortTrusted() {return portTrusted;}
-    DHCP4Profile & DHCP4Prof();
+    DHCP4Profile *& DHCP4Prof() {return dhcp4Prof;}
+
   private:
     bool enabled;
     bool portTrusted;
-    // Profile reference name
-    std::string profileName;
     // The opt82 profile cache
     DHCP4Profile *dhcp4Prof;
   };
@@ -56,13 +56,28 @@ namespace ns_opt82 {
   class SubscriberConfiguration {
   public:
     SubscriberConfiguration(SubscriberProfile *s = NULL): subsProf(s) {}
-    std::string & SubsProfName() {return subsProfName;}
+    SubscriberProfile *& SubsProf() {return subsProf;}
 
   private:
-    // Subscriber profile name
-    std::string subsProfName;
     // Subscriber profile
     SubscriberProfile *subsProf;
+  };
+
+  enum E_BaseIfNetworkSide {
+    E_BaseIfNetworkSide_Unknown,
+    E_BaseIfNetworkSide_User,
+    E_BaseIfNetworkSide_Net,
+  };
+
+  class BaseInterface {
+  public:
+    BaseInterface(std::string &nam);
+    std::string & Name() {return name;}
+    E_BaseIfNetworkSide getNetworkSide();
+
+  private:
+    std::string name;
+    E_BaseIfNetworkSide networkSide;
   };
 
   // The SubInterface
@@ -70,14 +85,22 @@ namespace ns_opt82 {
   class SubInterface {
   public:
     SubInterface(int objIndex);
-    SubInterface(SubInterface *s);
+    SubInterface(int objIndex, std::string &ifName);
+    SubInterface(int objIndex, BaseInterface & baseIf);
+    // SubInterface(SubInterface *s);
     ~SubInterface();
 
     int getObjIndex() {return objIndex;}
 
     bool isEnabled() {return enabled;}
     // The accesser to @enabled@
-    bool& Enable() {return enabled;}
+    bool & Enable() {return enabled;}
+
+    // Get the network side of this SubInterface
+    E_BaseIfNetworkSide getNetworkSide();
+
+    // Accesser to @bIf@
+    BaseInterface & BaseIf() {return bIf;}
 
     // The accesser to @dhcp4@
     DHCP4Configuration& DHCP4() {return dhcp4;}
@@ -92,6 +115,7 @@ namespace ns_opt82 {
   private:
     int objIndex;               // The key
     bool enabled;
+    BaseInterface bIf;
 
     // The bbf-dhcpv4 augment
     DHCP4Configuration dhcp4;
@@ -110,9 +134,7 @@ namespace ns_opt82 {
     ~I_SubInterfaces();
 
     // Get a subInterface element.
-    SubInterface & getSubIf(int objIndex);
-    // Get a pointer to the subInterface element.
-    // SubInterface * getSubIf_Ptr(int objIndex);
+    SubInterface * getSubIf(int objIndex);
     // Copy and store @subIf@. Object with the same key have only one entry.
     int storeSubIf(SubInterface & subIf);
     // Erase a subInterface by @objIndex@.
@@ -124,7 +146,7 @@ namespace ns_opt82 {
     // keyword to free the pointer.
     int eraseSubIf(int objIndex, SubInterface *& out_Ptr);
 
-    SubInterface & operator[](int objIndex);
+    SubInterface * operator[](int objIndex);
 
   private:
     // The SubInterfaces container

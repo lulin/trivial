@@ -76,6 +76,22 @@ namespace Sample {
   private:
     TestCopyInit o;
   };
+
+  class TestRefMemb {
+  public:
+    TestRefMemb(int &t): ref(t) {}
+    int &Ref() {return ref;}
+  private:
+    int &ref;
+  };
+
+  class TestMembInit {
+  public:
+    TestMembInit(const char *s): sstr(std::string(s)) {}
+    std::string & Sstr() {return sstr;}
+  private:
+    std::string sstr;
+  };
 }
 
 #endif
