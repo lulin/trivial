@@ -63,21 +63,23 @@ namespace ns_opt82 {
     SubscriberProfile *subsProf;
   };
 
-  enum E_BaseIfNetworkSide {
-    E_BaseIfNetworkSide_Unknown,
-    E_BaseIfNetworkSide_User,
-    E_BaseIfNetworkSide_Net,
+  // See the augment in bbf-l2-forwarding.yang
+  enum PortType {
+    PortType_Unknown,
+    PortType_User,
+    PortType_Net,
+    PortType_Subtended,
   };
 
   class BaseInterface {
   public:
     BaseInterface(std::string &nam);
     std::string & Name() {return name;}
-    E_BaseIfNetworkSide getNetworkSide();
+    PortType getNetworkSide();
 
   private:
     std::string name;
-    E_BaseIfNetworkSide networkSide;
+    PortType portType;
   };
 
   // The SubInterface
@@ -97,7 +99,7 @@ namespace ns_opt82 {
     bool & Enable() {return enabled;}
 
     // Get the network side of this SubInterface
-    E_BaseIfNetworkSide getNetworkSide();
+    PortType getNetworkSide();
 
     // Accesser to @bIf@
     BaseInterface & BaseIf() {return bIf;}
