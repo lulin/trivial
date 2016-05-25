@@ -2,7 +2,8 @@ EXEC = a.out
 SRCS = $(wildcard *.cpp)
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
-CXXFLAGS = -Wall -g# -std=c++11
+INCLUDES = -Iinclude
+CXXFLAGS = -Wall -g $(INCLUDES) # -std=c++11
 LDFLAGS =
 
 LD = g++
@@ -28,13 +29,13 @@ clean:
 
 rebuild: clean all
 
-cmake: build
-	cd build && cmake ..
-	echo "----"
-	echo "Please execute `make' in build"
+cmake: .build
+	cd .build && cmake ..
+	@echo "----"
+	@echo "Please execute 'make' in .build/"
 
 cmake-clean:
-	-rm -rf build
+	-rm -rf .build
 
-build:
+.build:
 	mkdir -p $@
