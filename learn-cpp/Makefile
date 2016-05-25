@@ -1,5 +1,5 @@
 EXEC = a.out
-SRCS = $(wildcard *.cpp)
+SRCS = $(wildcard src/*.cpp)
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
 INCLUDES = -Iinclude
