@@ -1,11 +1,27 @@
 #include <iostream>
 #include <map>
+#include <utility>
 #include "simple_class.hpp"
 
 using namespace std;
 
 extern map<string, Sample::SimpleCl *> g_smap;
 Sample::SimpleCl *g_simple = new Sample::SimpleCl();
+
+
+class mapWrap {
+public:
+  mapWrap(map<int, std::string> m_): m(m_) {};
+  map<int, std::string>::iterator begin() {return m.begin();}
+  map<int, std::string>::iterator end() {return m.end();}
+  map<int, std::string>::iterator find(int k) {return m.find(k);}
+  std::pair<map<int, std::string>::iterator, bool> insert(map<int, std::string>::value_type& val)
+  {
+    return m.insert(val);
+  }
+private:
+  map<int, std::string> m;
+};
 
 int main(int argc, char *argv[])
 {
@@ -120,5 +136,25 @@ int main(int argc, char *argv[])
   Sample::TestMembInit tm("hehe");
   cout << "tm.Sstr() = " << tm.Sstr() << endl;
   // Return ------------------------------------------
+
+  map<int, int *> mm;
+  if (mm.empty())
+    cout << "[1]mm is empty" << endl;
+
+  if (mm[1] == 0)
+    cout << "mm[1] == 0" << endl;
+
+  if (mm.empty())
+    cout << "[2]mm is empty" << endl;
+
+  map<int, std::string> m;
+  mapWrap mmap(m);
+  m.insert(std::make_pair(1, std::string("hehe")));
+  for (map<int, string>::iterator it = m.begin();
+       it != m.end();
+       it++) {
+    cout << "m[" << it->first << "] = " << it->second << endl;
+  }
+
 	return 0;
 }
