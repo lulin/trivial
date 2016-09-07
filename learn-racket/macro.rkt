@@ -10,3 +10,9 @@
 ;; Convert a syntax object to S-exp
 (syntax->datum g-stx)
 (eval (syntax->datum g-stx))
+
+(define (is-pair? e)
+  (match e
+    [empty "yes"]
+    [(cons x null) #t]
+    [_ #f]))

@@ -2,6 +2,7 @@
 #include <map>
 #include <utility>
 #include "simple_class.hpp"
+#include <person.hpp>
 
 using namespace std;
 
@@ -156,5 +157,6 @@ int main(int argc, char *argv[])
     cout << "m[" << it->first << "] = " << it->second << endl;
   }
 
+  ::test_constructor(0);
 	return 0;
 }
