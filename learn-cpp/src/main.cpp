@@ -2,7 +2,6 @@
 #include <map>
 #include <utility>
 #include "simple_class.hpp"
-#include <hook.h>
 #include <stdio.h>
 #include <person.hpp>
 
@@ -103,10 +102,6 @@ int main(int argc, char *argv[])
   // se = se + 1;
   cout << "Number of SimpleCl(10) + 1 = " << (se + 1).Number() << endl;
 
-  Sample::Assist as;
-  se.setHook(&as.hook, &as);
-  se.callHook();
-
   se[0] = 65;
   cout << "Se[0] = " << se[0] << endl;
 
@@ -171,15 +166,8 @@ int main(int argc, char *argv[])
   // map<int, string>::iterator it = p_m->begin();
   // cout << "md[" << it->first << "] = " << it->second << endl;
 
-  printf("---a %p\n", (void *)&Sample::SimpleCl::Number);
-  init_local_hook();
-  set_local_hook((void *)&Sample::SimpleCl::Number, 0);
-  check_local_hook();
-  // set_global_hook
-  printf("---a %p\n", (void *)&Sample::SimpleCl::Number);
   Sample::SimpleCl sx1(9);
   printf("sx1 = %d\n", sx1.Number());
   printf("%p - %p\n", fa, fb);
-  ::test_constructor(0);
 	return 0;
 }

@@ -3,7 +3,7 @@ SRCS = $(wildcard src/*.cpp)
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
 INCLUDES = -Iinclude
-CXXFLAGS = -Wall -g $(INCLUDES) -Wno-pmf-conversions -m32
+CXXFLAGS = -Wall -g $(INCLUDES)
 LDFLAGS =
 
 LD = g++

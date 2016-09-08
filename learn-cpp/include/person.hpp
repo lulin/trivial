@@ -4,21 +4,38 @@
 #include <iostream>
 #include <string>
 
-class sex {
+enum ESex {
+  ESex_male,
+  ESex_female,
+  ESex_unknown
+};
+class Sex {
 public:
-  sex();
-  sex(int s_);
+  Sex();
+  Sex(int s_);
   std::string to_str();
 private:
   int s;
 };
+
 class Person {
 public:
   Person(const std::string &nam);
+  Person(int sex_, const std::string& nam = "noname", int age_ = 20);
+  const std::string& getName();
+  void rename(std::string& nam);
+  const Sex& getSex();
+  void setSex(Sex& s);
+  int getAge();
+  void setAge(int a);
+  bool isMarried();
+  void setMarried(bool m);
+  const std::string& getPhone();
+  void setPhone(std::string &p);
 
 private:
   std::string name;
-  sex sex;
+  Sex sex;
   int age;
   bool married;
   std::string phone;

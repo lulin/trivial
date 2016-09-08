@@ -1,16 +1,42 @@
 #include "person.hpp"
 using namespace std;
 
-sex::sex()
+Sex::Sex()
 {
-  cout << s << endl;
+  cout << "field of bool, uninitialized explicitly: " << s << endl;
+  s = ESex_male;
+  cout << "initialized: " << this->to_str() << endl;
+}
+
+Sex::Sex(int s_)
+{
+  if (s_ < ESex_male || s_ >= ESex_female)
+    s = ESex_unknown;
+  else
+    s = s_;
+}
+
+string Sex::to_str()
+{
+  if (s == ESex_male)
+    return string("male");
+  if (s == ESex_female)
+    return string("female");
+  return string("unknown");
 }
 
 Person::Person(const std::string &nam)
 {
   name = nam;
-  this->age = 0;
+  this->age = 20;
   std::cout << name << " " << age << std::endl;
+}
+
+Person::Person(int s, const string& n, int a)
+  : name(n), sex(s)
+{
+  if (a < 1)
+    age = 20;
 }
 
 // test cases
@@ -24,7 +50,7 @@ int PersonUtils::test_constructor(void *arg)
 
 void PersonUtils::showPerson(Person &per)
 {
-  (void)per;
+  // (void)per;
   return;
 }
 
