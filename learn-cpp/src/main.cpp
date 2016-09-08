@@ -2,16 +2,20 @@
 #include <map>
 #include <utility>
 #include "simple_class.hpp"
+#include <hook.h>
+#include <stdio.h>
 
 using namespace std;
 
 extern map<string, Sample::SimpleCl *> g_smap;
 Sample::SimpleCl *g_simple = new Sample::SimpleCl();
 
+void fa() {}
+void fb() {}
 
 class mapWrap {
 public:
-  mapWrap(map<int, std::string> m_): m(m_) {};
+  mapWrap(map<int, std::string> m_): m(m_) {}
   map<int, std::string>::iterator begin() {return m.begin();}
   map<int, std::string>::iterator end() {return m.end();}
   map<int, std::string>::iterator find(int k) {return m.find(k);}
@@ -19,9 +23,14 @@ public:
   {
     return m.insert(val);
   }
-private:
   map<int, std::string> m;
 };
+
+// class mapWrapDerived : mapWrap {
+// public:
+//   mapWrapDerived(map<int, string> m_) {mapWrap(m_);}
+//   int a;
+// };
 
 int main(int argc, char *argv[])
 {
@@ -156,5 +165,19 @@ int main(int argc, char *argv[])
     cout << "m[" << it->first << "] = " << it->second << endl;
   }
 
+  // mapWrapDerived md(m);
+  // mapWrap *p_m = reinterpret_cast<mapWrap *>(&md);
+  // map<int, string>::iterator it = p_m->begin();
+  // cout << "md[" << it->first << "] = " << it->second << endl;
+
+  printf("---a %p\n", (void *)&Sample::SimpleCl::Number);
+  init_local_hook();
+  set_local_hook((void *)&Sample::SimpleCl::Number, 0);
+  check_local_hook();
+  // set_global_hook
+  printf("---a %p\n", (void *)&Sample::SimpleCl::Number);
+  Sample::SimpleCl sx1(9);
+  printf("sx1 = %d\n", sx1.Number());
+  printf("%p - %p\n", fa, fb);
 	return 0;
 }
