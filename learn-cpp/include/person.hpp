@@ -18,6 +18,7 @@ private:
   int s;
 };
 
+extern Sex gsex;
 class Person {
 public:
   Person(const std::string &nam);
@@ -36,6 +37,7 @@ public:
 private:
   std::string name;
   Sex sex;
+  const Sex& orign_sex;
   int age;
   bool married;
   std::string phone;

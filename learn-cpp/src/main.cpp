@@ -10,9 +10,6 @@ using namespace std;
 extern map<string, Sample::SimpleCl *> g_smap;
 Sample::SimpleCl *g_simple = new Sample::SimpleCl();
 
-void fa() {}
-void fb() {}
-
 class mapWrap {
 public:
   mapWrap(map<int, std::string> m_): m(m_) {}
@@ -34,6 +31,8 @@ public:
 
 int main(int argc, char *argv[])
 {
+  (void)argc;
+  (void)argv;
 	cout << "My first c++ program.\n";
 
   // Create an auto variable
@@ -166,8 +165,6 @@ int main(int argc, char *argv[])
   // map<int, string>::iterator it = p_m->begin();
   // cout << "md[" << it->first << "] = " << it->second << endl;
 
-  Sample::SimpleCl sx1(9);
-  printf("sx1 = %d\n", sx1.Number());
-  printf("%p - %p\n", fa, fb);
+  Sex::Sex sx;
 	return 0;
 }

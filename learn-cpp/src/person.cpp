@@ -25,7 +25,9 @@ string Sex::to_str()
   return string("unknown");
 }
 
+Sex gsex = Sex(0);
 Person::Person(const std::string &nam)
+  : orign_sex(gsex)
 {
   name = nam;
   this->age = 20;
@@ -33,7 +35,7 @@ Person::Person(const std::string &nam)
 }
 
 Person::Person(int s, const string& n, int a)
-  : name(n), sex(s)
+  : name(n), sex(s), orign_sex(gsex)
 {
   if (a < 1)
     age = 20;
@@ -50,7 +52,7 @@ int PersonUtils::test_constructor(void *arg)
 
 void PersonUtils::showPerson(Person &per)
 {
-  // (void)per;
+  (void)per;
   return;
 }
 
