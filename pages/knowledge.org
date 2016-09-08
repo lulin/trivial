@@ -1,0 +1,43 @@
+* My knowledge
+
+Some knowledge is gained by using it, like tools.
+Some knowledge is gained by thinking and praticing.
+
+** Programming languages
+*** c
+*** c++
+*** racket
+**** Status
+**** Priority: High
+***** [%] learning
+1. [%] racket guide
+*** lua
+*** swift*
+*** ruby*
+
+** Tools
+*** org mode
+**** Priority: Low
+Learn and use
+
+** Operating systems
+*** linux kernel
+
+** Algorithms & Mathematics
+*** descrete mathematics
+*** linear algebra
+
+** Compilers(front end)
+*** llvm
+
+** Concurrent & Parallel
+*** event driven paradigm
+*** linux performance book
+
+** Computer philosophy
+
+** Practice
+*** linux kernel source
+*** glib
+*** libevent
+*** libuv

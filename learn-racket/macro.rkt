@@ -1,16 +1,18 @@
 #lang racket
 
-(define-syntax (foo x)
-  (println x)
-  #'(+ 1 1))
+;; define a syntax transformer
+(define-syntax (foo stx)
+  #'(displayln "hehe"))
 
-(define-syntax (s1 s)
-  #'"hello, world")
+;; define a syntax object with 'define'
+(define g-stx #'(displayln "hehe"))
 
-(define g-stx #'"hehe")
-g-stx
+;; Convert a syntax object to S-exp
+(syntax->datum g-stx)
+(eval (syntax->datum g-stx))
 
-(define-syntax (s2 s)
-  (println s)
-  #'(eval 'g-stx))
-
+(define (is-pair? e)
+  (match e
+    [empty "yes"]
+    [(cons x null) #t]
+    [_ #f]))

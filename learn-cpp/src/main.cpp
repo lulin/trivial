@@ -4,6 +4,7 @@
 #include "simple_class.hpp"
 #include <hook.h>
 #include <stdio.h>
+#include <person.hpp>
 
 using namespace std;
 
@@ -179,5 +180,6 @@ int main(int argc, char *argv[])
   Sample::SimpleCl sx1(9);
   printf("sx1 = %d\n", sx1.Number());
   printf("%p - %p\n", fa, fb);
+  ::test_constructor(0);
 	return 0;
 }
