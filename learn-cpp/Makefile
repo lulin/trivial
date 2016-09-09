@@ -6,11 +6,12 @@ INCLUDES = -Iinclude
 CXXFLAGS = -Wall -g $(INCLUDES)
 LDFLAGS =
 
-LD = g++
-ifeq ($(shell which clang),)
+ifeq ($(shell which clang++),)
 CXX = g++
+LD = g++
 else
-CXX = $(shell which clang)
+CXX = $(shell which clang++)
+LD = clang++
 endif
 
 .PHONY: all clean rebuild cmake cmake-clean
