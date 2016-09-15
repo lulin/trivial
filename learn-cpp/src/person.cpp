@@ -27,7 +27,7 @@ string Sex::to_str()
 
 Sex gsex = Sex(0);
 Person::Person(const std::string &nam)
-  : orign_sex(gsex)
+  :sex(), orign_sex(gsex)
 {
   name = nam;
   this->age = 20;
