@@ -16,3 +16,6 @@
     [empty "yes"]
     [(cons x null) #t]
     [_ #f]))
+
+(require test-engine/racket-tests)
+(check-expect 1 1)
