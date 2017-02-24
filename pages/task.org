@@ -1,0 +1,38 @@
+Study anything at any where and any time. The only way to cure the panic on time flying away
+is study and research.
+
+* Study tasks
+ 
+Tasks list, by topic
+
+** Linux kernel
+*** ULK [e & i]
+*** interupt [e & i]
+*** linux device drivers
+** Linux network
+*** understanding linux network internals
+** Tools & framework
+*** org mode [e & i]
+*** doxygen [i]
+*** ettercap
+** Boot loader
+** Concurrent & parallel
+** Mathematics
+** Algorithms
+*** introduction to algorithms
+*** leetcode
+*** pkuoj
+** Parsing techniques
+** Compilers
+** Lang
+*** lua
+*** racket
+*** python
+*** c++
+** Network
+** CV & image
+** AI
+*** 机器学习 - 周志华
+*** tensorflow
+
+** Protocols
