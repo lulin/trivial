@@ -1,0 +1,19 @@
+noauth
+user 'user2'
+password '123'
+refuse-eap
+mtu 1450
+mru 1450
+maxfail 0
+holdoff 10
+ipcp-accept-remote ipcp-accept-local
+noipdefault
+usepeerdns
+default-asyncmap
+nopcomp noaccomp
+novj nobsdcomp nodeflate
+lcp-max-terminate 0
+lcp-echo-interval 20
+lcp-echo-failure 6
+unit 5
+ktune
