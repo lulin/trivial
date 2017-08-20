@@ -13,10 +13,20 @@ stop() {
 restart() {
     stop
     # wait until stopped
-    while [ "$(ps|grep l2tp|grep -v grep)" ]; do
+    while [ proc_alive ]; do
         sleep 1
     done
     start
+}
+
+proc_zombie() {}
+proc_alive() {
+    local proc="$1"
+
+    ps |grep "$proc"|grep -v grep >/dev/null
+    ret=$?
+    test $? -eq 0 && return true
+    return false
 }
 
 reload() {
