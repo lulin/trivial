@@ -2,8 +2,12 @@
 
 PIDFILE=/var/run/xl2tpd.pid
 L2TP_PIPE=/var/run/xl2tpd/l2tp-control
+CONFILE=/tmp/xl2tpd.conf
 
 start() {
+    config
+    xl2tpd -c $CONFILE
+    if
 }
 
 stop() {
