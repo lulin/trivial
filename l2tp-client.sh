@@ -13,10 +13,13 @@ stop() {
 restart() {
     stop
     # wait until stopped
-    while [ proc_alive ]; do
+    count=0
+    while [ proc_alive && test $count -lt 5 ]; do
         sleep 1
+        ((count++))
     done
     start
+    return $?
 }
 
 proc_zombie() {}
