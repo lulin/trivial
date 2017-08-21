@@ -50,12 +50,18 @@ start() {
 
     # connect wan, if setup
     if [ "$wan_proto" == "l2tp" ]; then
+        username="$(nvram get wan_l2tp_username)"
+        password="$(nvram get wan_l2tp_password)"
+        build_optfile "$wan_optfile" "$username" "$password"
         xl2tpd-control add $wan_lac
         xl2tpd-control connect $wan_lac
     fi
 
     # connect vpn, if setup
     if [ $vpnc_enable -ne 0 ]; then
+        username="$(nvram get vpnc_name)"
+        password="$(nvram get vpnc_password)"
+        build_optfile "$vpnc_optfile" "$username" "$password"
         xl2tpd_control add $vpnc_lac
         xl2tpd_control connect $vpnc_lac
     fi
